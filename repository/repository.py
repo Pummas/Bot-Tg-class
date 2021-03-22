@@ -33,11 +33,10 @@ class Repository:
             item_tuple = (user_id,)
             cursor.execute(us_id, item_tuple)
             record = cursor.fetchone()
-            print(record[0])
-            print(user_id)
             cursor.close()
+            return record is not None
 
-    def register_user(self,user_id,name):
+    def register_user(self, user_id, name):
         try:
             cursor = self.connection.cursor()
             insert_query = """ INSERT INTO registration (user_id, name) VALUES (%s,%s)"""
@@ -53,3 +52,13 @@ class Repository:
         finally:
             if self.connection:
                 cursor.close()
+
+    # def return_name_skill(self,user_id):
+    #     cursor = self.connection.cursor()
+    #     us_id = "SELECT user_id FROM registration WHERE user_id = %s"
+    #     item_tuple = (user_id,)
+    #     cursor.execute(us_id, item_tuple)
+    #     record = cursor.fetchone()
+    #     print(record[1],record[2])
+    #     print(user_id)
+    #     cursor.close()
