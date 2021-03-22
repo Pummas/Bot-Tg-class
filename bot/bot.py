@@ -2,6 +2,9 @@ import aiogram
 from aiogram import types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+# from aiogram.types import ReplyKeyboardRemove, \
+#     ReplyKeyboardMarkup, KeyboardButton, \
+#     InlineKeyboardMarkup, InlineKeyboardButton
 import datetime
 
 
@@ -16,7 +19,11 @@ class Bot:
 
         @dp.message_handler(commands=['start'])
         async def process_start_command(message: types.Message):
-            await message.reply("Привет!\nНапиши мне что-нибудь!")
+            try:
+                self.repository.check_registration(message.from_user.id)
+                await message.reply("Привет!")
+            except:
+                await message.reply("Как я могу к вам обращаться?")
 
         @dp.message_handler(commands=['help'])
         async def process_help_command(message: types.Message):
@@ -24,7 +31,13 @@ class Bot:
 
         @dp.message_handler()
         async def echo_message(msg: types.Message):
-            await self.bot.send_message(msg.from_user.id, msg.text)
-            self.repository.save_message(msg.from_user.id, msg.text, datetime.datetime.now())
+            try:
+                self.repository.check_registration(msg.from_user.id)
+                await self.bot.send_message(msg.from_user.id, msg.text)
+                self.repository.save_message(msg.from_user.id, msg.text, datetime.datetime.now())
+            except:
+                self.repository.register_user(msg.from_user.id, msg.text)
+                a = "Привет, " + msg.text
+                await self.bot.send_message(msg.from_user.id, a)
 
         executor.start_polling(dp)
